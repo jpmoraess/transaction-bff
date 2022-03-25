@@ -20,6 +20,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 
+	//open feign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.0'
+
 	// spring doc
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-webflux-ui', version: '1.6.3'
 	implementation("org.springframework.boot:spring-boot-starter-validation")
