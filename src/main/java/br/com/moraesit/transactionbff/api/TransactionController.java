@@ -1,5 +1,6 @@
 package br.com.moraesit.transactionbff.api;
 
+import br.com.moraesit.transactionbff.domain.TransactionService;
 import br.com.moraesit.transactionbff.dto.RequestTransactionDto;
 import br.com.moraesit.transactionbff.dto.TransactionDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,13 +9,21 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
+
+    private final TransactionService transactionService;
+
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
 
     @Operation(description = "API para criar uma transação financeira")
     @ApiResponses(value = {
@@ -23,9 +32,10 @@ public class TransactionController {
             @ApiResponse(responseCode = "403", description = "Erro de autorização."),
             @ApiResponse(responseCode = "404", description = "Recurso não encontrado.")
     })
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     public Mono<TransactionDto> enviarTransacao(@RequestBody final RequestTransactionDto requestTransactionDto) {
-        return Mono.empty();
+        var save = transactionService.save(requestTransactionDto);
+        return save.map(Mono::just).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Operation(description = "API para buscar uma transação financeira")
@@ -38,9 +48,10 @@ public class TransactionController {
     @Parameters(value = {
             @Parameter(name = "id", in = ParameterIn.PATH)
     })
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{id}")
     public Mono<TransactionDto> buscarTransacao(@PathVariable("id") final String uuid) {
-        return Mono.empty();
+        var transacao = transactionService.findById(uuid);
+        return transacao.map(Mono::just).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Operation(description = "API para remover uma transação financeira")

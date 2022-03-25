@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
@@ -13,9 +15,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@RedisHash(value = "TransactionDto", timeToLive = 300)
 @EqualsAndHashCode(of = "uuid")
 public class TransactionDto {
 
+    @Id
     @Schema(description = "Código de identificação da transação")
     private UUID uuid;
 
