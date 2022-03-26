@@ -2,6 +2,7 @@ spring:
   redis:
     port: 6379
     host: localhost
+    timeout: 5000
 
 springdoc:
   swagger-ui:
