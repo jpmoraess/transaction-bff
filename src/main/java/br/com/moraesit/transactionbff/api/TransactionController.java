@@ -3,16 +3,15 @@ package br.com.moraesit.transactionbff.api;
 import br.com.moraesit.transactionbff.domain.TransactionService;
 import br.com.moraesit.transactionbff.dto.RequestTransactionDto;
 import br.com.moraesit.transactionbff.dto.TransactionDto;
+import br.com.moraesit.transactionbff.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -35,7 +34,7 @@ public class TransactionController {
     @PostMapping
     public Mono<TransactionDto> enviarTransacao(@RequestBody final RequestTransactionDto requestTransactionDto) {
         var save = transactionService.save(requestTransactionDto);
-        return save.map(Mono::just).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return save.map(Mono::just).orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada."));
     }
 
     @Operation(description = "API para buscar uma transação financeira")
@@ -51,7 +50,7 @@ public class TransactionController {
     @GetMapping("/{id}")
     public Mono<TransactionDto> buscarTransacao(@PathVariable("id") final String uuid) {
         var transacao = transactionService.findById(uuid);
-        return transacao.map(Mono::just).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return transacao.map(Mono::just).orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada."));
     }
 
     @Operation(description = "API para remover uma transação financeira")
