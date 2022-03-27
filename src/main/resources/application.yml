@@ -1,4 +1,14 @@
 spring:
+  application:
+    name: transaction-bff
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      client_id: ${spring.application.name}
+      transaction-id-prefix: ${spring.application.name}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
   redis:
     port: 6379
     host: localhost
@@ -10,3 +20,6 @@ springdoc:
 
 limites:
   url: http://localhost:8081
+
+app:
+  topic: transaction
