@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
@@ -32,9 +34,8 @@ public class TransactionController {
             @ApiResponse(responseCode = "404", description = "Recurso não encontrado.")
     })
     @PostMapping
-    public Mono<TransactionDto> enviarTransacao(@RequestBody final RequestTransactionDto requestTransactionDto) {
-        var save = transactionService.save(requestTransactionDto);
-        return save.map(Mono::just).orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada."));
+    public Mono<RequestTransactionDto> enviarTransacao(@RequestBody final RequestTransactionDto requestTransactionDto) {
+        return transactionService.save(requestTransactionDto);
     }
 
     @Operation(description = "API para buscar uma transação financeira")

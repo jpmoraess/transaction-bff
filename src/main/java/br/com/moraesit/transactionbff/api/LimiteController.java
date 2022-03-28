@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/limites")
@@ -18,7 +21,7 @@ public class LimiteController {
     }
 
     @GetMapping("/{agencia}/{conta}")
-    public LimiteDiario buscarLimiteDiario(@PathVariable Long agencia, @PathVariable Long conta) {
+    public Mono<LimiteDiario> buscarLimiteDiario(@PathVariable Long agencia, @PathVariable Long conta) {
         return limiteService.buscarLimiteDiario(agencia, conta);
     }
 }
