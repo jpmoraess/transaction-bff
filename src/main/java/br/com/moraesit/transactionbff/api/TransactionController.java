@@ -11,10 +11,13 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
+import java.time.Duration;
+import java.util.List;
 
 @RestController
 @RequestMapping("/transaction")
@@ -36,6 +39,38 @@ public class TransactionController {
     @PostMapping
     public Mono<RequestTransactionDto> enviarTransacao(@RequestBody final RequestTransactionDto requestTransactionDto) {
         return transactionService.save(requestTransactionDto);
+    }
+
+
+    @Operation(description = "API para listar as transações de uma determinada agencia/conta.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Retorno OK da listagem de transações."),
+            @ApiResponse(responseCode = "401", description = "Erro de autenticação."),
+            @ApiResponse(responseCode = "403", description = "Erro de autorização."),
+            @ApiResponse(responseCode = "404", description = "Recurso não encontrado.")
+    })
+    @GetMapping("/{agencia}/{conta}")
+    public Flux<List<TransactionDto>> listarTransacoes(@PathVariable final Long agencia, @PathVariable final Long conta) {
+        return transactionService.findByAgenciaAndContaFlux(agencia, conta);
+    }
+
+    @Operation(description = "API para Streams de trasações de uma determinada agencia/conta.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Retorno OK da listagem de transações."),
+            @ApiResponse(responseCode = "401", description = "Erro de autenticação."),
+            @ApiResponse(responseCode = "403", description = "Erro de autorização."),
+            @ApiResponse(responseCode = "404", description = "Recurso não encontrado.")
+    })
+    @GetMapping("/sse/{agencia}/{conta}")
+    public Flux<ServerSentEvent<List<TransactionDto>>> listarTransacoesSSE(@PathVariable final Long agencia, @PathVariable final Long conta) {
+        return Flux.interval(Duration.ofSeconds(2))
+                .map(sequence -> ServerSentEvent.<List<TransactionDto>>builder()
+                        .id(String.valueOf(sequence))
+                        .event("transações")
+                        .data(transactionService.findByAgenciaAndConta(agencia, conta))
+                        .retry(Duration.ofSeconds(1))
+                        .build()
+                );
     }
 
     @Operation(description = "API para buscar uma transação financeira")

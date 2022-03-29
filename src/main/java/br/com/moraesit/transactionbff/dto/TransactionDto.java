@@ -50,7 +50,6 @@ public class TransactionDto {
     @Schema(description = "Situação da transação")
     private SituacaoEnum situacao;
 
-    @JsonIgnore
     public void naoAnalisada() {
         this.situacao = SituacaoEnum.NAO_ANALISADA;
     }

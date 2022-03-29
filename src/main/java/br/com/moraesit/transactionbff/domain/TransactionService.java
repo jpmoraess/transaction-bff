@@ -1,9 +1,9 @@
 package br.com.moraesit.transactionbff.domain;
 
 import br.com.moraesit.transactionbff.dto.RequestTransactionDto;
-import br.com.moraesit.transactionbff.dto.SituacaoEnum;
 import br.com.moraesit.transactionbff.dto.TransactionDto;
 import br.com.moraesit.transactionbff.exception.ResourceNotFoundException;
+import br.com.moraesit.transactionbff.feign.TransactionClient;
 import br.com.moraesit.transactionbff.redis.TransactionRedisRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,10 +14,13 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -26,15 +29,18 @@ public class TransactionService {
 
     private final TransactionRedisRepository transactionRedisRepository;
     private final RetryTemplate retryTemplate;
+    private final TransactionClient transactionClient;
     private final ReactiveKafkaProducerTemplate<String, RequestTransactionDto> reactiveKafkaProducerTemplate;
 
     @Value("${app.topic}")
     private String topic;
 
     public TransactionService(TransactionRedisRepository transactionRedisRepository, RetryTemplate retryTemplate,
-                              ReactiveKafkaProducerTemplate<String, RequestTransactionDto> reactiveKafkaProducerTemplate) {
+                              TransactionClient transactionClient, ReactiveKafkaProducerTemplate<String,
+            RequestTransactionDto> reactiveKafkaProducerTemplate) {
         this.transactionRedisRepository = transactionRedisRepository;
         this.retryTemplate = retryTemplate;
+        this.transactionClient = transactionClient;
         this.reactiveKafkaProducerTemplate = reactiveKafkaProducerTemplate;
     }
 
@@ -60,6 +66,18 @@ public class TransactionService {
                         log.info("Mensagem enviada para o kafka com sucesso.");
                     }
                 });
+    }
+
+    public Flux<List<TransactionDto>> findByAgenciaAndContaFlux(final Long agencia, final Long conta) {
+        final List<TransactionDto> byAgenciaAndConta = findByAgenciaAndConta(agencia, conta);
+        return Flux.fromIterable(byAgenciaAndConta).cache(Duration.ofSeconds(2))
+                .limitRate(200)
+                .defaultIfEmpty(new TransactionDto())
+                .buffer(200);
+    }
+
+    public List<TransactionDto> findByAgenciaAndConta(final Long agencia, final Long conta) {
+        return transactionClient.buscarTransacoes(agencia, conta);
     }
 
     public Optional<TransactionDto> findById(final String id) {

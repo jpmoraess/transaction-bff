@@ -20,6 +20,8 @@ springdoc:
 
 limites:
   url: http://localhost:8081
+transaction:
+  url: http://localhost:8082
 
 app:
   topic: transaction
