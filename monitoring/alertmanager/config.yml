@@ -1,0 +1,10 @@
+route:
+  receiver: 'slack'
+
+receivers:
+  - name: 'slack'
+#    slack_configs:
+#      - send_resolved: true
+#        username: username
+#        channel: channel_name
+#        api_url: api_url
