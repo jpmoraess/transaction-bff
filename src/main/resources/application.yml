@@ -37,7 +37,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://keycloak.coffeandit.com.br/auth/realms/master
+          issuer-uri: https://keycloak.coffeeandit.com.br/auth/realms/master
 
 springdoc:
   swagger-ui:
