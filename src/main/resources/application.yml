@@ -1,5 +1,15 @@
 server:
-  port: 8080
+  #port: 8080
+  http2:
+    enabled: true
+  port: 8443
+  ssl:
+    enabled: true
+    key-store-type: PKCS12
+    key-store: classpath:keystore.jks
+    key-store-password: changeit
+    trust-store-password: changeit
+    trust-store: classpath:cacerts.jks
 
 spring:
   application:
@@ -22,6 +32,12 @@ spring:
       exporter:
         otlp:
           endpoint: http://localhost:4317
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://keycloack.coffeandit.com.br/auth/realms/master
 
 springdoc:
   swagger-ui:
