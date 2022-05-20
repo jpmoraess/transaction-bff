@@ -47,6 +47,7 @@ public class TransactionService {
     @Transactional
     @Retryable(value = QueryTimeoutException.class, maxAttempts = 5, backoff = @Backoff(delay = 100))
     public Mono<RequestTransactionDto> save(final RequestTransactionDto requestTransactionDto) {
+        log.info("Salvando a requisição {}", requestTransactionDto);
         return Mono.fromCallable(() -> {
                     requestTransactionDto.setData(LocalDateTime.now());
                     requestTransactionDto.naoAnalisada();

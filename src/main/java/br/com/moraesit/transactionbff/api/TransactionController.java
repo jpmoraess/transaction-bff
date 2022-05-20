@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.sleuth.annotation.SpanTag;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/transaction")
+@Slf4j
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -37,7 +40,8 @@ public class TransactionController {
             @ApiResponse(responseCode = "404", description = "Recurso não encontrado.")
     })
     @PostMapping
-    public Mono<RequestTransactionDto> enviarTransacao(@RequestBody final RequestTransactionDto requestTransactionDto) {
+    public Mono<RequestTransactionDto> enviarTransacao(@SpanTag("enviarTransacao") @RequestBody final RequestTransactionDto requestTransactionDto) {
+        log.info("Recebendo a requisição {}", requestTransactionDto);
         return transactionService.save(requestTransactionDto);
     }
 

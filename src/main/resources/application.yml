@@ -17,6 +17,12 @@ spring:
     host: localhost
     timeout: 5000
 
+  sleuth:
+    otel:
+      exporter:
+        otlp:
+          endpoint: http://localhost:4317
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

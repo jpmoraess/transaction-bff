@@ -1,0 +1,18 @@
+version: "2"
+services:
+  collector:
+    image: logzio/otel-collector-traces
+    environment:
+      - LOGZIO_REGIO=us
+      #- LOGZIO_TRACES_TOKEN=<SEU-TOKEN>
+    ports:
+      - "1777:1777"
+      - "9411:9411"
+      - "9943:9943"
+      - "6831:6831"
+      - "6832:6832"
+      - "14250:14250"
+      - "14268:14268"
+      - "4317:4317"
+      - "55681:55681"
+      - "8888:8888"

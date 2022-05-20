@@ -10,6 +10,7 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+	maven { url = "https://repo.spring.io/milestone"}
 }
 
 dependencies {
@@ -47,6 +48,14 @@ dependencies {
 	// micrometer e actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
+
+	// open telemetry
+	implementation 'org.springframework.cloud:spring-cloud-sleuth-otel:1.1.0-M5'
+	implementation 'org.springframework.cloud:spring-cloud-sleuth-otel-autoconfigure:1.1.0-M5'
+	implementation('org.springframework.cloud:spring-cloud-starter-sleuth:3.1.2') {
+		exclude group: 'org.springframework.cloud', module: 'spring-cloud-sleuth-brave'
+	}
+	implementation 'io.opentelemetry:opentelemetry-exporter-otlp-trace:1.12.0'
 }
 
 tasks.named('test') {
